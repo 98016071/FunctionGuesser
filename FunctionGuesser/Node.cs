@@ -21,7 +21,14 @@ namespace FunctionGuesser
             set
             {
                 _left = value;
-                value.Parent = this;
+                if (value == null)
+                {
+                    Update();
+                }
+                else
+                {
+                    value.Parent = this;
+                }
             } }
         private INode _right;
         public INode Right
@@ -30,7 +37,14 @@ namespace FunctionGuesser
             set
             {
                 _right = value;
-                value.Parent = this;
+                if (value == null)
+                {
+                    Update();
+                }
+                else
+                {
+                    value.Parent = this;
+                }
             }
         }
         public Node(INode left, INode right, Operator op)
@@ -111,7 +125,6 @@ namespace FunctionGuesser
         public void DeleteSubTree()
         {
             Parent.DeleteChild(this);
-            Parent.Update();
         }
 
         public double GetValue(double x, double y)

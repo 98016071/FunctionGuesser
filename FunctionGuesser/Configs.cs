@@ -18,7 +18,8 @@ namespace FunctionGuesser
         public static readonly int ChanceNumber = 4;
         public static readonly int ChanceVariable = 1;
 
-        public static readonly double ChanceDelete = 1/30;
+        public static readonly double ChanceDelete = 1D / 25;
+        public static readonly double MaxSize = 100;
 
     }
 }
