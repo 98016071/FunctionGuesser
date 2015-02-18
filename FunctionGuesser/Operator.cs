@@ -52,10 +52,9 @@ namespace FunctionGuesser
             }
         }
 
-        static Operator randomOperator()
+        public static Operator RandomOperator()
         {
-            var rand = new Random();
-            switch (rand.Next(0, Cnt - 1))
+            switch (Tools.RandInt(0, Cnt))
             {
                 case 0:
                     return PlusOperator;
@@ -69,9 +68,9 @@ namespace FunctionGuesser
             return null;
         }
 
-        public string ToString()
+        public override string ToString()
         {
-            return str;
+            return " " + str + " ";
         }
     }
 }

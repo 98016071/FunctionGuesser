@@ -8,6 +8,7 @@ namespace FunctionGuesser
 {
     class LeafNodeVariable : LeafNode
     {
+        // This is leaf node, that contains variable
         private string strRepresentation;
 
         public LeafNodeVariable(string str)
@@ -25,6 +26,20 @@ namespace FunctionGuesser
         public override double GetValue(double x, double y)
         {
             return strRepresentation == "x" ? x : y;
+        }
+
+        public override string ToString()
+        {
+            return strRepresentation;
+        }
+
+        public static new LeafNodeVariable GenerateRandom()
+        {
+            var res = Tools.RandInt(0, 2);
+            if (res == 0) 
+                return new LeafNodeVariable("x");
+            else
+                return new LeafNodeVariable("y");
         }
     }
 }

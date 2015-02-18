@@ -12,7 +12,8 @@ namespace FunctionGuesser
         Node Parent { get; set; }
         INode Copy();
         void ChangeRandom();
-        void DeleteRandom();
+        void InsertRandom();
+        void DeleteRandom(int depth);
         void DeleteSubTree();
         double GetValue(double x, double y);
     }

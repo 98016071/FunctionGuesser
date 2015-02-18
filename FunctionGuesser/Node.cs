@@ -11,12 +11,28 @@ namespace FunctionGuesser
     {
         public int Size
         {
-            get { return Left.Size + Right.Size; } 
+            get { return Left.Size + Right.Size; }
         }
         public Node Parent { get; set; }
         public Operator Operator { get; set; }
-        public INode Left { get; set; }
-        public INode Right { get; set; }
+        private INode _left;
+        public INode Left {
+            get { return _left; }
+            set
+            {
+                _left = value;
+                value.Parent = this;
+            } }
+        private INode _right;
+        public INode Right
+        {
+            get { return _right; }
+            set
+            {
+                _right = value;
+                value.Parent = this;
+            }
+        }
         public Node(INode left, INode right, Operator op)
         {
             Left = left;
@@ -30,12 +46,38 @@ namespace FunctionGuesser
 
         public void ChangeRandom()
         {
-            Left.ChangeRandom();
+            var chanceLeft = Configs.ChanceChildNode;
+            var chanceRight = Configs.ChanceChildNode;
+            var chanceAdd = Configs.ChanceInsertNode;
+            var chanceOperator = Configs.ChanceOperatorNode;
+            var res = Tools.RandInt(0, chanceLeft + chanceRight + chanceAdd + chanceOperator);
+            if (res < chanceLeft)
+                Left.ChangeRandom();
+            else if (res < chanceLeft + chanceRight)
+                Right.ChangeRandom();
+            else if (res < chanceLeft + chanceRight + chanceAdd)
+                InsertRandom();
+            else
+                Operator = Operator.RandomOperator();
         }
 
-        public void DeleteRandom()
+        public void InsertRandom()
         {
-            throw new NotImplementedException();
+            var node = new Node(Left, Right, Operator.RandomOperator());
+            Left = node;
+            Right = LeafNode.GenerateRandom();
+        }
+
+        public void DeleteRandom(int depth)
+        {
+            var chance = Configs.ChanceDelete * depth;
+            if (Tools.RandDouble() <= chance)
+                DeleteSubTree();
+            else 
+                if (Tools.RandDouble() <= 0.5)
+                    Left.DeleteRandom(depth + 1);
+                else
+                    Right.DeleteRandom(depth + 1);
         }
 
         public void Replace(INode a, INode b)
@@ -43,27 +85,33 @@ namespace FunctionGuesser
             if (Left == a)
             {
                 Left = b;
+                b.Parent = this;
             }
             else if (Right == a)
             {
                 Right = b;
+                b.Parent = this;
             }
             else
             {
                 throw new Exception("No such child" + a.ToString());
             }
-        } 
+        }
         public void DeleteChild(INode child)
         {
             if (child == Left)
                 Left = null;
             else if (child == Right)
                 Right = null;
-            throw new Exception("No such child.");
+            else
+            {
+                throw new Exception("No such child." + child.ToString());
+            }
         }
         public void DeleteSubTree()
         {
             Parent.DeleteChild(this);
+            Parent.Update();
         }
 
         public double GetValue(double x, double y)
@@ -73,24 +121,14 @@ namespace FunctionGuesser
 
         public void Update()
         {
-            if (Left != null && Right != null) 
+            if (Left != null && Right != null)
                 return;
-            if (Parent == null)
-            {
-                if (Left != null)
-                {
-                    Left.Parent = null;
-                }
-                if (Right != null)
-                {
-                    Right.Parent = null;
-                }
-            }
             if (Left == null)
             {
-                if (Right.GetType() == typeof(LeafNode))
+                if (Right is LeafNode)
                 {
-                    Parent.Replace(this, Right);
+                    if (Parent != null)
+                        Parent.Replace(this, Right);
                     Right.Parent = Parent;
                 }
                 else
@@ -100,9 +138,10 @@ namespace FunctionGuesser
             }
             else if (Right == null)
             {
-                if (Left.GetType() == typeof(LeafNode))
+                if (Left is LeafNode)
                 {
-                    Parent.Replace(this, Left);
+                    if (Parent != null)
+                        Parent.Replace(this, Left);
                     Left.Parent = Parent;
                 }
                 else
@@ -110,7 +149,7 @@ namespace FunctionGuesser
                     ((Node)Left).UpdateParent();
                 }
             }
-   
+
         }
         public void UpdateParent()
         {
@@ -128,7 +167,7 @@ namespace FunctionGuesser
             Right.Parent = Parent;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return "(" + Left.ToString() + Operator.ToString() + Right.ToString() + ")";
         }
